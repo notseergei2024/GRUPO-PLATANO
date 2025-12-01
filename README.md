@@ -1,6 +1,5 @@
 # GRUPO-PLATA
 
-
 proyecto-etl/
 │
 ├── data/
