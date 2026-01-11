@@ -8,7 +8,7 @@ from datetime import datetime
 import pandas as pd
 from sqlalchemy import create_engine, text
 
-# ---------------- CONFIG ---------------- #
+#CONFIG#
 
 INPUT_DIR = "input"
 OUTPUT_DIR = "output"
@@ -30,7 +30,7 @@ logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
-# ---------------- UTILS ---------------- #
+# UTILS#
 
 def remove_accents(text):
     if pd.isna(text):
@@ -75,7 +75,7 @@ def mask_card(card):
     card = re.sub(r"\D", "", card)
     return "XXXX-XXXX-XXXX-" + card[-4:]
 
-# ---------------- LOAD CSV ---------------- #
+#  LOAD CSV #
 
 def load_csv(file_path):
     return pd.read_csv(
@@ -86,7 +86,7 @@ def load_csv(file_path):
         on_bad_lines="skip"
     )
 
-# ---------------- ETL CLIENTES ---------------- #
+# ETL CLIENTES#
 
 def process_clientes(df):
     rejected = []
@@ -116,7 +116,7 @@ def process_clientes(df):
 
     return df_valid
 
-# ---------------- ETL TARJETAS ---------------- #
+#  ETL TARJETAS #
 
 def process_tarjetas(df):
     df = df.applymap(clean_text)
@@ -128,7 +128,7 @@ def process_tarjetas(df):
 
     return df
 
-# ---------------- DATABASE ---------------- #
+#DATABASE #
 
 def load_to_db(df, table_name):
     engine = create_engine(DB_URL)
@@ -136,7 +136,7 @@ def load_to_db(df, table_name):
     with engine.begin() as conn:
         df.to_sql(table_name, conn, if_exists="append", index=False)
 
-# ---------------- MAIN PIPELINE ---------------- #
+#  MAIN PIPELINE #
 
 def run_pipeline():
     logging.info("Inicio del pipeline ETL")
