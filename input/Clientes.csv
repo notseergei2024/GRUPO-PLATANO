@@ -1,0 +1,6 @@
+Cod cliente;nombre;apellido1;apellido2;dni;correo;telefono
+C001; María ;García ;Pérez;12345678Z;Maria.Garcia@Example.com; 612345678
+C002;JOSÉ;LÓPEZ;HERNÁNDEZ;87654321B;jose.lopez@example.com;612345679
+C003;Ana-María;Ruiz; ;23456789C;ana.ruiz@example.com;612345680
+C004;Luis;Martín;Sánchez;11111111H;luis.martinexample.com;ABC123
+C005;Laura ; Gómez ; ;99999999R;laura.gomez@example.com; 698765432
