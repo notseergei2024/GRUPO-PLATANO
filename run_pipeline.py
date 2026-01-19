@@ -18,7 +18,7 @@ OUTPUT_DIR = "output"   # Carpeta donde se guardan los CSV procesados
 ERROR_DIR = "errors"    # Carpeta donde se guardan los registros rechazados
 LOG_DIR = "logs"        # Carpeta donde se guardan los logs
 
-DB_URL = "postgresql://user:password@localhost:5432/etl_db"  # Conexión a PostgreSQL
+DB_URL = "mysql://grupo_plata_user:Plata123!@localhost:3307/etl_db"  # Conexión a PostgreSQL
 SALT = "MI_SALT_SECRETA"  # Sal para hashing seguro
 
 # Crear directorios si no existen
