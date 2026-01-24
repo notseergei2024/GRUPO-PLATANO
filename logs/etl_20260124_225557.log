@@ -1,0 +1,10 @@
+2026-01-24 22:55:57,603 - INFO - \U0001f680 INICIO PIPELINE ETL
+2026-01-24 22:55:57,604 - INFO - \U0001f4c2 Archivos encontrados en 'input': 2
+2026-01-24 22:55:57,604 - INFO -    - Clientes.csv
+2026-01-24 22:55:57,604 - INFO -    - Tarjetas.csv
+2026-01-24 22:55:57,604 - INFO - \U0001f9fe Clientes válidos por patrón: 0 -> []
+2026-01-24 22:55:57,604 - INFO - \U0001f4b3 Tarjetas válidos por patrón: 0 -> []
+2026-01-24 22:55:57,604 - WARNING - Se ignorarán 2 ficheros por no cumplir patrón: ['Clientes.csv', 'Tarjetas.csv']
+2026-01-24 22:55:57,604 - WARNING - Ejemplo: 'Clientes.csv' NO vale. Debe ser 'Clientes-YYYY-MM-DD.csv'.
+2026-01-24 22:55:57,604 - WARNING - No hay ficheros válidos para procesar. Revisa nombres y patrón.
+2026-01-24 22:55:57,604 - INFO - \u2705 FIN PIPELINE ETL (sin procesar)
