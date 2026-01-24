@@ -1,0 +1,25 @@
+2026-01-24 23:37:51,133 - INFO - \U0001f680 INICIO PIPELINE ETL
+2026-01-24 23:37:51,134 - INFO - \U0001f4c1 Rutas: input=C:\Users\storm\PycharmProjects\GRUPO-PLATANO\input output=C:\Users\storm\PycharmProjects\GRUPO-PLATANO\output errors=C:\Users\storm\PycharmProjects\GRUPO-PLATANO\errors
+2026-01-24 23:37:51,134 - INFO - \U0001f9fe Patrones: ^Clientes-\d{4}-\d{2}-\d{2}\.csv$ | ^Tarjetas-\d{4}-\d{2}-\d{2}\.csv$
+2026-01-24 23:37:51,134 - INFO - \U0001f4c2 Archivos encontrados en 'input': 2
+2026-01-24 23:37:51,134 - INFO -    - Clientes-2026-01-19.csv
+2026-01-24 23:37:51,134 - INFO -    - Tarjetas-2026-01-19.csv
+2026-01-24 23:37:51,136 - INFO - \U0001f9fe Clientes válidos por patrón: 1 -> ['Clientes-2026-01-19.csv']
+2026-01-24 23:37:51,136 - INFO - \U0001f4b3 Tarjetas válidos por patrón: 1 -> ['Tarjetas-2026-01-19.csv']
+2026-01-24 23:37:51,136 - WARNING - DB desactivada (ENABLE_DB=False). No se intenta conexión.
+2026-01-24 23:37:51,136 - INFO - 
+\U0001f9fe Procesando CLIENTES: Clientes-2026-01-19.csv
+2026-01-24 23:37:51,136 - INFO - \U0001f4e5 Leyendo CSV: input\Clientes-2026-01-19.csv
+2026-01-24 23:37:51,138 - INFO - \u2705 CSV cargado (utf-8) filas=50 columnas=7
+2026-01-24 23:37:51,138 - INFO -    Columnas: ['cod_cliente', 'nombre', 'apellido1', 'apellido2', 'dni', 'correo', 'telefono']
+2026-01-24 23:37:51,138 - INFO - \U0001f9fd ETL Clientes: limpieza general (strip + quitar acentos)...
+2026-01-24 23:37:51,142 - INFO - \U0001f50e Validaciones: DNI / Teléfono / Correo...
+2026-01-24 23:37:51,145 - INFO - \u2705 Clientes: válidas=50 | rechazadas=0
+2026-01-24 23:37:51,148 - INFO - \U0001f4be Output clientes guardado: output\Clientes-2026-01-19.cleaned.csv | filas=50
+2026-01-24 23:37:51,148 - WARNING - SKIP BD: no se inserta en 'clientes' (db_ok=False).
+2026-01-24 23:37:51,148 - INFO - 
+\U0001f4b3 Procesando TARJETAS: Tarjetas-2026-01-19.csv
+2026-01-24 23:37:51,149 - INFO - \U0001f4e5 Leyendo CSV: input\Tarjetas-2026-01-19.csv
+2026-01-24 23:37:51,149 - INFO - \u2705 CSV cargado (utf-8) filas=60 columnas=4
+2026-01-24 23:37:51,149 - INFO -    Columnas: ['cod_cliente', 'numero_tarjeta', 'fecha_exp', 'cvv']
+2026-01-24 23:37:51,149 - INFO - \U0001f9fd ETL Tarjetas: limpieza general (strip + quitar acentos)...

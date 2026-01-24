@@ -265,7 +265,11 @@ def process_tarjetas(df: pd.DataFrame, source_file: str):
     if not require_columns(df, required, source_file):
         return None
 
-    df = df.applymap(clean_text)  # <- applymap (con m)
+    df = df.astype("string").apply(lambda col: col.map(clean_text))
+    print("DEBUG Tarjetas limpieza OK -> filas:", len(df), "columnas:", list(df.columns))
+    print("DEBUG ejemplo numero_tarjeta (primeras 3):",
+          df["numero_tarjeta"].head(3).tolist() if "numero_tarjeta" in df.columns else "NO EXISTE")
+    print("DEBUG ejemplo cvv (primeras 3):", df["cvv"].head(3).tolist() if "cvv" in df.columns else "NO EXISTE")
 
     logi("🔐 Anonimizando: mask + hash. Eliminando CVV...")
     df["numero_tarjeta_masked"] = df["numero_tarjeta"].apply(mask_card)
