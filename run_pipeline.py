@@ -201,5 +201,5 @@ def run_pipeline():
 
 # ---------------- EJECUCIÓN ---------------- #
 
-if _name_ == "_main_":
+if __name__ == "__main__":
     run_pipeline()  # Ejecuta el pipeline completo
