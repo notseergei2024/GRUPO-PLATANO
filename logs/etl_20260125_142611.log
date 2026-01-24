@@ -1,0 +1,34 @@
+2026-01-25 14:26:11,270 - INFO - \U0001f680 INICIO PIPELINE ETL
+2026-01-25 14:26:11,270 - INFO - \U0001f4c1 Rutas: input=C:\Users\storm\PycharmProjects\GRUPO-PLATANO\input output=C:\Users\storm\PycharmProjects\GRUPO-PLATANO\output errors=C:\Users\storm\PycharmProjects\GRUPO-PLATANO\errors
+2026-01-25 14:26:11,270 - INFO - \U0001f9fe Patrones: ^Clientes-\d{4}-\d{2}-\d{2}\.csv$ | ^Tarjetas-\d{4}-\d{2}-\d{2}\.csv$
+2026-01-25 14:26:11,271 - INFO - \U0001f4c2 Archivos encontrados en 'input': 2
+2026-01-25 14:26:11,271 - INFO -    - Clientes-2026-01-19.csv
+2026-01-25 14:26:11,271 - INFO -    - Tarjetas-2026-01-19.csv
+2026-01-25 14:26:11,271 - INFO - \U0001f9fe Clientes válidos por patrón: 1 -> ['Clientes-2026-01-19.csv']
+2026-01-25 14:26:11,271 - INFO - \U0001f4b3 Tarjetas válidos por patrón: 1 -> ['Tarjetas-2026-01-19.csv']
+2026-01-25 14:26:11,271 - WARNING - DB desactivada (ENABLE_DB=False). No se intenta conexión.
+2026-01-25 14:26:11,271 - INFO - 
+\U0001f9fe Procesando CLIENTES: Clientes-2026-01-19.csv
+2026-01-25 14:26:11,271 - INFO - \U0001f4e5 Leyendo CSV: input\Clientes-2026-01-19.csv
+2026-01-25 14:26:11,283 - INFO - \u2705 CSV cargado (utf-8) filas=50 columnas=7
+2026-01-25 14:26:11,283 - INFO -    Columnas: ['cod_cliente', 'nombre', 'apellido1', 'apellido2', 'dni', 'correo', 'telefono']
+2026-01-25 14:26:11,283 - INFO - \U0001f9fd ETL Clientes: limpieza general (strip + quitar acentos)...
+2026-01-25 14:26:11,290 - INFO - \U0001f50e Validaciones: DNI / Teléfono / Correo...
+2026-01-25 14:26:11,296 - INFO - \u2705 Clientes: válidas=50 | rechazadas=0
+2026-01-25 14:26:11,301 - INFO - \U0001f4be Output clientes guardado: output\Clientes-2026-01-19.cleaned.csv | filas=50
+2026-01-25 14:26:11,301 - WARNING - SKIP BD: no se inserta en 'clientes' (db_ok=False).
+2026-01-25 14:26:11,301 - INFO - 
+\U0001f4b3 Procesando TARJETAS: Tarjetas-2026-01-19.csv
+2026-01-25 14:26:11,301 - INFO - \U0001f4e5 Leyendo CSV: input\Tarjetas-2026-01-19.csv
+2026-01-25 14:26:11,309 - INFO - \u2705 CSV cargado (utf-8) filas=60 columnas=4
+2026-01-25 14:26:11,309 - INFO -    Columnas: ['cod_cliente', 'numero_tarjeta', 'fecha_exp', 'cvv']
+2026-01-25 14:26:11,309 - INFO - \U0001f9fd ETL Tarjetas: limpieza general (strip + quitar acentos)...
+2026-01-25 14:26:11,311 - INFO - \U0001f510 Anonimizando: mask + hash. Eliminando CVV...
+2026-01-25 14:26:11,312 - INFO - \u2705 Tarjetas: filas=60 | columnas=['cod_cliente', 'fecha_exp', 'numero_tarjeta_masked', 'numero_tarjeta_hash']
+2026-01-25 14:26:11,313 - INFO - \U0001f4be Output tarjetas guardado: output\Tarjetas-2026-01-19.cleaned.csv | filas=60
+2026-01-25 14:26:11,313 - WARNING - SKIP BD: no se inserta en 'tarjetas' (db_ok=False).
+2026-01-25 14:26:11,313 - INFO - 
+\U0001f4ca RESUMEN FINAL
+2026-01-25 14:26:11,313 - INFO -    - ENABLE_DB: False
+2026-01-25 14:26:11,313 - INFO -    - Log file: C:\Users\storm\PycharmProjects\GRUPO-PLATANO\logs\etl_20260125_142611.log
+2026-01-25 14:26:11,313 - INFO - \u2705 FIN PIPELINE ETL

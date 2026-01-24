@@ -20,7 +20,7 @@ ERROR_DIR = "errors"
 LOG_DIR = "logs"
 
 # ✅ Para ahora (BD apagada): NO intentamos conectar.
-ENABLE_DB = False
+ENABLE_DB = True
 
 # Cuando activéis BD, usad esto (requiere pip install pymysql):
 # DB_URL = "mysql+pymysql://grupo_plata_user:Plata123!@83.32.73.143:3306/etl_db"
@@ -265,7 +265,11 @@ def process_tarjetas(df: pd.DataFrame, source_file: str):
     if not require_columns(df, required, source_file):
         return None
 
-    df = df.applymap(clean_text)  # <- applymap (con m)
+    df = df.astype("string").apply(lambda col: col.map(clean_text))
+    print("DEBUG Tarjetas limpieza OK -> filas:", len(df), "columnas:", list(df.columns))
+    print("DEBUG ejemplo numero_tarjeta (primeras 3):",
+          df["numero_tarjeta"].head(3).tolist() if "numero_tarjeta" in df.columns else "NO EXISTE")
+    print("DEBUG ejemplo cvv (primeras 3):", df["cvv"].head(3).tolist() if "cvv" in df.columns else "NO EXISTE")
 
     logi("🔐 Anonimizando: mask + hash. Eliminando CVV...")
     df["numero_tarjeta_masked"] = df["numero_tarjeta"].apply(mask_card)
@@ -280,14 +284,13 @@ def process_tarjetas(df: pd.DataFrame, source_file: str):
 
 # ---------------- DB (LISTA PERO DESACTIVADA) ---------------- #
 
-def test_db_connection() -> bool:
+def test_db_connection(engine) -> bool:
     if not ENABLE_DB:
         logw("DB desactivada (ENABLE_DB=False). No se intenta conexión.")
         return False
 
     logi("🔌 Probando conexión a MySQL...")
     try:
-        engine = create_engine(DB_URL)
         with engine.connect() as conn:
             conn.execute(text("SELECT 1"))
         logi("✅ Conexión a MySQL OK (SELECT 1)")
@@ -296,7 +299,8 @@ def test_db_connection() -> bool:
         logw(f"No hay conexión a BD: {e}")
         return False
 
-def load_to_db(df: pd.DataFrame, table_name: str, db_ok: bool):
+
+def load_to_db(df: pd.DataFrame, table_name: str, db_ok: bool, engine):
     if not db_ok:
         logw(f"SKIP BD: no se inserta en '{table_name}' (db_ok=False).")
         return
@@ -305,13 +309,20 @@ def load_to_db(df: pd.DataFrame, table_name: str, db_ok: bool):
         return
 
     try:
-        engine = create_engine(DB_URL)
         with engine.begin() as conn:
             conn.execute(text("SELECT 1"))
-            df.to_sql(table_name, conn, if_exists="append", index=False)
+            df.to_sql(
+                table_name,
+                con=conn,
+                if_exists="append",
+                index=False,
+                chunksize=2000,
+                method="multi"
+            )
         logi(f"✅ Insertadas {len(df)} filas en '{table_name}'")
     except SQLAlchemyError as e:
         logw(f"Error insertando en BD '{table_name}': {e}")
+
 
 
 # ---------------- PIPELINE ---------------- #
@@ -345,7 +356,8 @@ def run_pipeline():
         logw("No hay ficheros válidos. Fin.")
         return
 
-    db_ok = test_db_connection()
+    engine = create_engine(DB_URL) if ENABLE_DB else None
+    db_ok = test_db_connection(engine) if engine else False
 
     # --- CLIENTES ---
     for file in clientes_files:
@@ -366,7 +378,7 @@ def run_pipeline():
         df_clean.to_csv(out_path, index=False)
         logi(f"💾 Output clientes guardado: {out_path} | filas={len(df_clean)}")
 
-        load_to_db(df_clean, "clientes", db_ok)
+        load_to_db(df_clean, "clientes", db_ok, engine)
 
     # --- TARJETAS ---
     for file in tarjetas_files:
@@ -387,7 +399,7 @@ def run_pipeline():
         df_clean.to_csv(out_path, index=False)
         logi(f"💾 Output tarjetas guardado: {out_path} | filas={len(df_clean)}")
 
-        load_to_db(df_clean, "tarjetas", db_ok)
+        load_to_db(df_clean, "tarjetas", db_ok, engine)
 
     logi("\n📊 RESUMEN FINAL")
     logi(f"   - ENABLE_DB: {ENABLE_DB}")
