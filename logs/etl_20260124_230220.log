@@ -1,0 +1,14 @@
+2026-01-24 23:02:20,429 - INFO - \U0001f680 INICIO PIPELINE ETL
+2026-01-24 23:02:20,429 - INFO - \U0001f4c2 Archivos encontrados en 'input': 2
+2026-01-24 23:02:20,429 - INFO -    - Clientes-2026-01-19.csv
+2026-01-24 23:02:20,430 - INFO -    - Tarjetas-2026-01-19.csv
+2026-01-24 23:02:20,430 - INFO - \U0001f9fe Clientes válidos por patrón: 1 -> ['Clientes-2026-01-19.csv']
+2026-01-24 23:02:20,430 - INFO - \U0001f4b3 Tarjetas válidos por patrón: 1 -> ['Tarjetas-2026-01-19.csv']
+2026-01-24 23:02:20,430 - INFO - \U0001f50c Probando conexión a MySQL (si está apagada, no rompemos)...
+2026-01-24 23:02:20,463 - WARNING - No hay conexión a BD (esperado si está apagada): No module named 'MySQLdb'
+2026-01-24 23:02:20,463 - INFO - 
+\U0001f9fe Procesando CLIENTES: Clientes-2026-01-19.csv
+2026-01-24 23:02:20,463 - INFO - \U0001f4e5 Leyendo CSV: input\Clientes-2026-01-19.csv
+2026-01-24 23:02:20,478 - INFO - \u2705 CSV cargado (utf-8): filas=50 columnas=7
+2026-01-24 23:02:20,478 - INFO -    Columnas: ['cod_cliente', 'nombre', 'apellido1', 'apellido2', 'dni', 'correo', 'telefono']
+2026-01-24 23:02:20,478 - INFO - \U0001f9fd ETL Clientes: limpieza general (strip + quitar acentos)...
