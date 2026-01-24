@@ -1,1 +1,7 @@
 
+2026-01-24 21:51:28,136 - INFO - Inicio del pipeline ETL
+2026-01-24 21:51:28,138 - WARNING - Fichero ignorado: Clientes.csv
+2026-01-24 21:51:28,138 - WARNING - Fichero ignorado: Tarjetas.csv
+2026-01-24 21:51:28,138 - INFO - Fin del pipeline ETL
+2026-01-24 21:59:09,754 - INFO - Inicio del pipeline ETL
+2026-01-24 22:10:53,615 - INFO - Inicio del pipeline ETL
