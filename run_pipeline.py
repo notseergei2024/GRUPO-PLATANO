@@ -24,7 +24,8 @@ ENABLE_DB = True
 
 # Cuando activéis BD, usad esto (requiere pip install pymysql):
 # DB_URL = "mysql+pymysql://grupo_plata_user:Plata123!@83.32.73.143:3306/etl_db"
-DB_URL = "mysql://grupo_plata_user:Plata123!@83.32.73.143:3306/grupo_plata"
+DB_URL = "mysql+pymysql://grupo_plata_user:Plata123!@83.32.73.143:3306/grupo_plata"
+
 
 SALT = "MI_SALT_SECRETA"
 
@@ -262,7 +263,8 @@ def process_clientes(df: pd.DataFrame, source_file: str):
 
 # ---------------- ETL TARJETAS ---------------- #
 
-def process_tarjetas(df: pd.DataFrame, source_file: str):
+def process_tarjetas(df: pd.DataFrame, source_file: str, valid_clientes: set[str]):
+
     logi("ETL Tarjetas: limpieza general (strip + quitar acentos)...")
 
     df = normalize_columns(df)
@@ -277,19 +279,32 @@ def process_tarjetas(df: pd.DataFrame, source_file: str):
           df["numero_tarjeta"].head(3).tolist() if "numero_tarjeta" in df.columns else "NO EXISTE")
     print("DEBUG ejemplo cvv (primeras 3):", df["cvv"].head(3).tolist() if "cvv" in df.columns else "NO EXISTE")
 
-    # ✅ Hash dentro de la MISMA columna 'numero_tarjeta'
-    df["numero_tarjeta"] = df["numero_tarjeta"].apply(hash_value)
+    # ✅ Normaliza cod_cliente para comparar bien
+    df["cod_cliente"] = df["cod_cliente"].astype("string").map(clean_text)
 
-    # ✅ Si el proyecto exige anonimizar el CVV también, usa esto:
-    df["cvv"] = df["cvv"].apply(hash_value)
+    # ✅ Filtrado FK: solo tarjetas cuyo cod_cliente exista en clientes
+    mask_ok = df["cod_cliente"].isin(valid_clientes)
+    df_rejected = df[~mask_ok].copy()
+    df_valid = df[mask_ok].copy()
+
+    logi(f" Tarjetas: válidas={len(df_valid)} | rechazadas={len(df_rejected)} (FK cod_cliente->clientes)")
+
+    if not df_rejected.empty:
+        df_rejected["motivo_rechazo"] = "fk_cliente_no_existe"
+        rej_path = os.path.join(ERROR_DIR, f"rows_rejected_tarjetas_{RUN_ID}.csv")
+        df_rejected.to_csv(rej_path, index=False)
+        logw(f"Rechazados guardados en: {rej_path}")
+
+    # ✅ Hash dentro de las MISMAS columnas (sin añadir columnas)
+    df_valid["numero_tarjeta"] = df_valid["numero_tarjeta"].apply(hash_value)
+    df_valid["cvv"] = df_valid["cvv"].apply(hash_value)
 
     # DataFrame EXACTO para BD (solo columnas reales)
     tarjetas_cols_db = ["cod_cliente", "numero_tarjeta", "fecha_exp", "cvv"]
-    df_db = df[tarjetas_cols_db].copy()
+    df_db = df_valid[tarjetas_cols_db].copy()
 
     logi(f" Tarjetas (DB): filas={len(df_db)} | columnas={list(df_db.columns)}")
     return df_db
-
 
 # ---------------- DB (LISTA PERO DESACTIVADA) ---------------- #
 
@@ -307,6 +322,17 @@ def test_db_connection(engine) -> bool:
     except Exception as e:
         logw(f"No hay conexión a BD: {e}")
         return False
+
+def fetch_existing_client_codes(engine, db_ok: bool) -> set[str]:
+    if not db_ok or engine is None:
+        return set()
+    try:
+        with engine.connect() as conn:
+            rows = conn.execute(text("SELECT cod_cliente FROM clientes")).fetchall()
+        return {str(r[0]).strip() for r in rows if r[0] is not None}
+    except Exception as e:
+        logw(f"No se pudieron leer cod_cliente existentes de clientes: {e}")
+        return set()
 
 
 def load_to_db(df: pd.DataFrame, table_name: str, db_ok: bool, engine):
@@ -367,6 +393,8 @@ def run_pipeline():
 
     engine = create_engine(DB_URL) if ENABLE_DB else None
     db_ok = test_db_connection(engine) if engine else False
+    valid_clientes = fetch_existing_client_codes(engine, db_ok)
+    logi(f" Clientes existentes en BD: {len(valid_clientes)}")
 
     # --- CLIENTES ---
     for file in clientes_files:
@@ -385,9 +413,13 @@ def run_pipeline():
 
         out_path = os.path.join(OUTPUT_DIR, file.replace(".csv", ".cleaned.csv"))
         df_clean.to_csv(out_path, index=False)
-        logi(f"💾 Output clientes guardado: {out_path} | filas={len(df_clean)}")
+        # ✅ añadimos los cod_cliente de ESTE run al set (para que tarjetas los reconozca)
+        valid_clientes.update(df_clean["cod_cliente"].dropna().astype(str).map(str.strip).tolist())
+
+        logi(f" Output clientes guardado: {out_path} | filas={len(df_clean)}")
 
         load_to_db(df_clean, "clientes", db_ok, engine)
+
 
     # --- TARJETAS ---
     for file in tarjetas_files:
@@ -399,7 +431,7 @@ def run_pipeline():
             loge(f"Saltando {file} (no se pudo leer)")
             continue
 
-        df_clean = process_tarjetas(df, file)
+        df_clean = process_tarjetas(df, file, valid_clientes)
         if df_clean is None:
             loge(f"Saltando {file} (fallo columnas requeridas)")
             continue
