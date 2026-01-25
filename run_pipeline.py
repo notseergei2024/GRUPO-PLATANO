@@ -335,13 +335,13 @@ def fetch_existing_client_codes(engine, db_ok: bool) -> set[str]:
         return set()
 
 
-def load_to_db(df: pd.DataFrame, table_name: str, db_ok: bool, engine):
+def load_to_db(df: pd.DataFrame, table_name: str, db_ok: bool, engine) -> bool:
     if not db_ok:
         logw(f"SKIP BD: no se inserta en '{table_name}' (db_ok=False).")
-        return
+        return False
     if df is None or df.empty:
         logw(f"SKIP BD: '{table_name}' sin filas.")
-        return
+        return False
 
     try:
         with engine.begin() as conn:
@@ -355,9 +355,10 @@ def load_to_db(df: pd.DataFrame, table_name: str, db_ok: bool, engine):
                 method="multi"
             )
         logi(f"Insertadas {len(df)} filas en '{table_name}'")
+        return True
     except SQLAlchemyError as e:
-        logw(f"Error insertando en BD '{table_name}': {e}")
-
+        loge(f"Error insertando en BD '{table_name}': {e}")
+        return False
 
 
 # ---------------- PIPELINE ---------------- #
@@ -412,14 +413,23 @@ def run_pipeline():
             continue
 
         out_path = os.path.join(OUTPUT_DIR, file.replace(".csv", ".cleaned.csv"))
-        df_clean.to_csv(out_path, index=False)
-        # ✅ añadimos los cod_cliente de ESTE run al set (para que tarjetas los reconozca)
-        valid_clientes.update(df_clean["cod_cliente"].dropna().astype(str).map(str.strip).tolist())
 
+        df_clean.to_csv(out_path, index=False)
         logi(f" Output clientes guardado: {out_path} | filas={len(df_clean)}")
 
-        load_to_db(df_clean, "clientes", db_ok, engine)
+        ok_insert = load_to_db(df_clean, "clientes", db_ok, engine)
 
+        # ✅ Solo añadimos al set si REALMENTE se insertó en BD
+        if ok_insert:
+            valid_clientes.update(
+                df_clean["cod_cliente"].dropna().astype(str).map(str.strip).tolist()
+            )
+        else:
+            logw("No se actualiza valid_clientes porque el insert de CLIENTES falló.")
+
+    # ✅ Refrescamos desde BD para garantizar FK
+    valid_clientes = fetch_existing_client_codes(engine, db_ok)
+    logi(f" Clientes existentes en BD (refresco): {len(valid_clientes)}")
 
     # --- TARJETAS ---
     for file in tarjetas_files:
