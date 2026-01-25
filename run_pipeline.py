@@ -236,9 +236,11 @@ def process_clientes(df: pd.DataFrame, source_file: str):
     df["Correo_KO"] = df["Correo_OK"].map({"Y": "N", "N": "Y"})
 
     # Rechazados mínimos: correo inválido
+    # ✅ No rechazamos por correo: insertamos TODOS para no romper FK
     df_rejected = df[df["Correo_OK"] == "N"].copy()
-    df_valid = df[df["Correo_OK"] == "Y"].copy()
-    # ✅ Hash dentro de la MISMA columna 'dni' (sin crear columnas nuevas)
+    df_valid = df.copy()
+
+    # ✅ Hash dentro de la MISMA columna 'dni'
     df_valid["dni"] = df_valid["dni"].apply(hash_value)
 
     logi(f" Clientes: válidas={len(df_valid)} | rechazadas={len(df_rejected)}")
