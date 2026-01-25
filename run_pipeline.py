@@ -24,7 +24,7 @@ ENABLE_DB = True
 
 # Cuando activéis BD, usad esto (requiere pip install pymysql):
 # DB_URL = "mysql+pymysql://grupo_plata_user:Plata123!@83.32.73.143:3306/etl_db"
-DB_URL = "mysql://grupo_plata_user:Plata123!@83.32.73.143:3306/etl_db"
+DB_URL = "mysql://grupo_plata_user:Plata123!@83.32.73.143:3306/grupo_plata"
 
 SALT = "MI_SALT_SECRETA"
 
