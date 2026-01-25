@@ -1,0 +1,8 @@
+2026-01-25 21:28:45,946 - INFO -  INICIO PIPELINE ETL
+2026-01-25 21:28:45,946 - INFO - Rutas: input=C:\Users\storm\PycharmProjects\GRUPO-PLATANO\input output=C:\Users\storm\PycharmProjects\GRUPO-PLATANO\output errors=C:\Users\storm\PycharmProjects\GRUPO-PLATANO\errors
+2026-01-25 21:28:45,946 - INFO - Patrones: ^Clientes-\d{4}-\d{2}-\d{2}\.csv$ | ^Tarjetas-\d{4}-\d{2}-\d{2}\.csv$
+2026-01-25 21:28:45,947 - INFO -  Archivos encontrados en 'input': 2
+2026-01-25 21:28:45,947 - INFO -    - Clientes-2026-01-19.csv
+2026-01-25 21:28:45,947 - INFO -    - Tarjetas-2026-01-19.csv
+2026-01-25 21:28:45,947 - INFO -  Clientes válidos por patrón: 1 -> ['Clientes-2026-01-19.csv']
+2026-01-25 21:28:45,947 - INFO -  Tarjetas válidos por patrón: 1 -> ['Tarjetas-2026-01-19.csv']

@@ -19,12 +19,12 @@ OUTPUT_DIR = "output"
 ERROR_DIR = "errors"
 LOG_DIR = "logs"
 
-# ✅ Para ahora (BD apagada): NO intentamos conectar.
+#  Para ahora (BD apagada): NO intentamos conectar.
 ENABLE_DB = True
 
 # Cuando activéis BD, usad esto (requiere pip install pymysql):
 # DB_URL = "mysql+pymysql://grupo_plata_user:Plata123!@83.32.73.143:3306/etl_db"
-DB_URL = "mysql://grupo_plata_user:Plata123!@83.32.73.143:3306/etl_db"
+DB_URL = "mysql://grupo_plata_user:Plata123!@83.32.73.143:3306/grupo_plata"
 
 SALT = "MI_SALT_SECRETA"
 
@@ -54,11 +54,11 @@ def logi(msg: str):
     logging.info(msg)
 
 def logw(msg: str):
-    print(f"⚠️ {msg}")
+    print(f" {msg}")
     logging.warning(msg)
 
 def loge(msg: str):
-    print(f"❌ {msg}")
+    print(f" {msg}")
     logging.error(msg)
 
 
@@ -138,7 +138,7 @@ def mask_card(card):
 # ---------------- CSV LOADER (ROBUST) ---------------- #
 
 def load_csv(file_path: str) -> pd.DataFrame | None:
-    logi(f"📥 Leyendo CSV: {file_path}")
+    logi(f" Leyendo CSV: {file_path}")
 
     if not os.path.exists(file_path):
         loge(f"No existe el fichero: {file_path}")
@@ -153,7 +153,7 @@ def load_csv(file_path: str) -> pd.DataFrame | None:
             encoding="utf-8",
             on_bad_lines="skip"
         )
-        logi(f"✅ CSV cargado (utf-8) filas={len(df)} columnas={len(df.columns)}")
+        logi(f" CSV cargado (utf-8) filas={len(df)} columnas={len(df.columns)}")
         logi(f"   Columnas: {list(df.columns)}")
         return df
     except UnicodeDecodeError:
@@ -171,7 +171,7 @@ def load_csv(file_path: str) -> pd.DataFrame | None:
             encoding="latin-1",
             on_bad_lines="skip"
         )
-        logi(f"✅ CSV cargado (latin-1) filas={len(df)} columnas={len(df.columns)}")
+        logi(f" CSV cargado (latin-1) filas={len(df)} columnas={len(df.columns)}")
         logi(f"   Columnas: {list(df.columns)}")
         return df
     except Exception as e:
@@ -208,7 +208,7 @@ def require_columns(df: pd.DataFrame, required: list[str], source_file: str) -> 
 # ---------------- ETL CLIENTES ---------------- #
 
 def process_clientes(df: pd.DataFrame, source_file: str):
-    logi("🧽 ETL Clientes: limpieza general (strip + quitar acentos)...")
+    logi("ETL Clientes: limpieza general (strip + quitar acentos)...")
 
     df = normalize_columns(df)
 
@@ -225,7 +225,7 @@ def process_clientes(df: pd.DataFrame, source_file: str):
     df["dni"] = df["dni"].apply(normalize_dni)
     df["telefono"] = df["telefono"].apply(normalize_phone)
 
-    logi("🔎 Validaciones: DNI / Teléfono / Correo...")
+    logi(" Validaciones: DNI / Teléfono / Correo...")
     df["DNI_OK"] = df["dni"].apply(validate_dni).map({True: "Y", False: "N"})
     df["DNI_KO"] = df["DNI_OK"].map({"Y": "N", "N": "Y"})
 
@@ -238,8 +238,10 @@ def process_clientes(df: pd.DataFrame, source_file: str):
     # Rechazados mínimos: correo inválido
     df_rejected = df[df["Correo_OK"] == "N"].copy()
     df_valid = df[df["Correo_OK"] == "Y"].copy()
+    # ✅ Hash dentro de la MISMA columna 'dni' (sin crear columnas nuevas)
+    df_valid["dni"] = df_valid["dni"].apply(hash_value)
 
-    logi(f"✅ Clientes: válidas={len(df_valid)} | rechazadas={len(df_rejected)}")
+    logi(f" Clientes: válidas={len(df_valid)} | rechazadas={len(df_rejected)}")
 
     if not df_rejected.empty:
         df_rejected["motivo_rechazo"] = "correo_invalido"
@@ -247,17 +249,19 @@ def process_clientes(df: pd.DataFrame, source_file: str):
         df_rejected.to_csv(rej_path, index=False)
         logw(f"Rechazados guardados en: {rej_path}")
 
-    # Anonimización DNI (hash) y eliminamos dni en claro
-    df_valid["dni_hash"] = df_valid["dni"].apply(hash_value)
-    df_valid.drop(columns=["dni"], inplace=True)
+    # ✅ DataFrame EXACTO para BD (solo columnas reales)
+    clientes_cols_db = ["cod_cliente", "nombre", "apellido1", "apellido2", "dni", "correo", "telefono"]
+    df_db = df_valid[clientes_cols_db].copy()
 
-    return df_valid, df_rejected
+    # df_valid puede mantener columnas extra (OK/KO) para el .cleaned.csv si quieres
+    return df_db, df_rejected
+
 
 
 # ---------------- ETL TARJETAS ---------------- #
 
 def process_tarjetas(df: pd.DataFrame, source_file: str):
-    logi("🧽 ETL Tarjetas: limpieza general (strip + quitar acentos)...")
+    logi("ETL Tarjetas: limpieza general (strip + quitar acentos)...")
 
     df = normalize_columns(df)
 
@@ -271,15 +275,18 @@ def process_tarjetas(df: pd.DataFrame, source_file: str):
           df["numero_tarjeta"].head(3).tolist() if "numero_tarjeta" in df.columns else "NO EXISTE")
     print("DEBUG ejemplo cvv (primeras 3):", df["cvv"].head(3).tolist() if "cvv" in df.columns else "NO EXISTE")
 
-    logi("🔐 Anonimizando: mask + hash. Eliminando CVV...")
-    df["numero_tarjeta_masked"] = df["numero_tarjeta"].apply(mask_card)
-    df["numero_tarjeta_hash"] = df["numero_tarjeta"].apply(hash_value)
+    # ✅ Hash dentro de la MISMA columna 'numero_tarjeta'
+    df["numero_tarjeta"] = df["numero_tarjeta"].apply(hash_value)
 
-    # Nunca guardar sensibles en claro
-    df.drop(columns=["numero_tarjeta", "cvv"], inplace=True)
+    # ✅ Si el proyecto exige anonimizar el CVV también, usa esto:
+    df["cvv"] = df["cvv"].apply(hash_value)
 
-    logi(f"✅ Tarjetas: filas={len(df)} | columnas={list(df.columns)}")
-    return df
+    # DataFrame EXACTO para BD (solo columnas reales)
+    tarjetas_cols_db = ["cod_cliente", "numero_tarjeta", "fecha_exp", "cvv"]
+    df_db = df[tarjetas_cols_db].copy()
+
+    logi(f" Tarjetas (DB): filas={len(df_db)} | columnas={list(df_db.columns)}")
+    return df_db
 
 
 # ---------------- DB (LISTA PERO DESACTIVADA) ---------------- #
@@ -289,11 +296,11 @@ def test_db_connection(engine) -> bool:
         logw("DB desactivada (ENABLE_DB=False). No se intenta conexión.")
         return False
 
-    logi("🔌 Probando conexión a MySQL...")
+    logi(" Probando conexión a MySQL...")
     try:
         with engine.connect() as conn:
             conn.execute(text("SELECT 1"))
-        logi("✅ Conexión a MySQL OK (SELECT 1)")
+        logi(" Conexión a MySQL OK (SELECT 1)")
         return True
     except Exception as e:
         logw(f"No hay conexión a BD: {e}")
@@ -319,7 +326,7 @@ def load_to_db(df: pd.DataFrame, table_name: str, db_ok: bool, engine):
                 chunksize=2000,
                 method="multi"
             )
-        logi(f"✅ Insertadas {len(df)} filas en '{table_name}'")
+        logi(f"Insertadas {len(df)} filas en '{table_name}'")
     except SQLAlchemyError as e:
         logw(f"Error insertando en BD '{table_name}': {e}")
 
@@ -328,16 +335,16 @@ def load_to_db(df: pd.DataFrame, table_name: str, db_ok: bool, engine):
 # ---------------- PIPELINE ---------------- #
 
 def run_pipeline():
-    logi("🚀 INICIO PIPELINE ETL")
-    logi(f"📁 Rutas: input={os.path.abspath(INPUT_DIR)} output={os.path.abspath(OUTPUT_DIR)} errors={os.path.abspath(ERROR_DIR)}")
-    logi(f"🧾 Patrones: {CLIENTES_PATTERN} | {TARJETAS_PATTERN}")
+    logi(" INICIO PIPELINE ETL")
+    logi(f"Rutas: input={os.path.abspath(INPUT_DIR)} output={os.path.abspath(OUTPUT_DIR)} errors={os.path.abspath(ERROR_DIR)}")
+    logi(f"Patrones: {CLIENTES_PATTERN} | {TARJETAS_PATTERN}")
 
     if not os.path.exists(INPUT_DIR):
         loge(f"No existe la carpeta '{INPUT_DIR}'. Crea input/ y mete los CSV.")
         return
 
     files = os.listdir(INPUT_DIR)
-    logi(f"📂 Archivos encontrados en 'input': {len(files)}")
+    logi(f" Archivos encontrados en 'input': {len(files)}")
     for f in files:
         logi(f"   - {f}")
 
@@ -345,8 +352,8 @@ def run_pipeline():
     tarjetas_files = [f for f in files if re.match(TARJETAS_PATTERN, f)]
     ignored = [f for f in files if f not in (clientes_files + tarjetas_files)]
 
-    logi(f"🧾 Clientes válidos por patrón: {len(clientes_files)} -> {clientes_files}")
-    logi(f"💳 Tarjetas válidos por patrón: {len(tarjetas_files)} -> {tarjetas_files}")
+    logi(f" Clientes válidos por patrón: {len(clientes_files)} -> {clientes_files}")
+    logi(f" Tarjetas válidos por patrón: {len(tarjetas_files)} -> {tarjetas_files}")
 
     if ignored:
         logw(f"Ficheros ignorados por nombre: {ignored}")
@@ -361,7 +368,7 @@ def run_pipeline():
 
     # --- CLIENTES ---
     for file in clientes_files:
-        logi(f"\n🧾 Procesando CLIENTES: {file}")
+        logi(f"\n Procesando CLIENTES: {file}")
         in_path = os.path.join(INPUT_DIR, file)
 
         df = load_csv(in_path)
@@ -397,14 +404,14 @@ def run_pipeline():
 
         out_path = os.path.join(OUTPUT_DIR, file.replace(".csv", ".cleaned.csv"))
         df_clean.to_csv(out_path, index=False)
-        logi(f"💾 Output tarjetas guardado: {out_path} | filas={len(df_clean)}")
+        logi(f" Output tarjetas guardado: {out_path} | filas={len(df_clean)}")
 
         load_to_db(df_clean, "tarjetas", db_ok, engine)
 
-    logi("\n📊 RESUMEN FINAL")
+    logi("\nRESUMEN FINAL")
     logi(f"   - ENABLE_DB: {ENABLE_DB}")
     logi(f"   - Log file: {os.path.abspath(os.path.join(LOG_DIR, f'etl_{RUN_ID}.log'))}")
-    logi("✅ FIN PIPELINE ETL")
+    logi(" FIN PIPELINE ETL")
 
 
 # ---------------- MAIN ---------------- #
