@@ -423,7 +423,7 @@ def run_pipeline():
 
     # --- TARJETAS ---
     for file in tarjetas_files:
-        logi(f"\n💳 Procesando TARJETAS: {file}")
+        logi(f"\n Procesando TARJETAS: {file}")
         in_path = os.path.join(INPUT_DIR, file)
 
         df = load_csv(in_path)
