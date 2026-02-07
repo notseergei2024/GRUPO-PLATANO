@@ -1,30 +1,27 @@
-# ============================================================
-# ETL PIPELINE - CLIENTES & TARJETAS
-# ============================================================
-
 # ---------------- IMPORTS ---------------- #
 
-import os
-import re
-import hashlib
-import logging
-import unicodedata
-from datetime import datetime
+import os              # Manejo de rutas y directorios
+import re              # Expresiones regulares para validaciones y patrones
+import hashlib         # Hashing seguro (SHA-256)
+import logging         # Sistema de logging para registrar el ETL
+import unicodedata     # Normalización de texto (eliminar acentos)
+from datetime import datetime  # Manejo de fechas (no se usa en este script)
 
-import pandas as pd
-from sqlalchemy import create_engine, text
+import pandas as pd    # Manipulación de datos
+from sqlalchemy import create_engine, text  # Conexión y carga a base de datos
 
 
 # ---------------- CONFIGURACIÓN ---------------- #
 
-INPUT_DIR = "input"
-OUTPUT_DIR = "output"
-ERROR_DIR = "errors"
-LOG_DIR = "logs"
+INPUT_DIR = "input"     # Carpeta de entrada de archivos CSV
+OUTPUT_DIR = "output"   # Carpeta donde se guardan los CSV procesados
+ERROR_DIR = "errors"    # Carpeta donde se guardan los registros rechazados
+LOG_DIR = "logs"        # Carpeta donde se guardan los logs
 
-DB_URL = "mysql://grupo_plata_user:Plata123!@83.32.73.143:3306/etl_db"
-SALT = "MI_SALT_SECRETA"
+DB_URL = "mysql://grupo_plata_user:Plata123!@83.32.73.143:3306/etl_db"  # Conexión a MySQL
+SALT = "MI_SALT_SECRETA"  # Sal para hashing seguro
 
+# Crear directorios si no existen
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 os.makedirs(ERROR_DIR, exist_ok=True)
 os.makedirs(LOG_DIR, exist_ok=True)
@@ -33,28 +30,16 @@ os.makedirs(LOG_DIR, exist_ok=True)
 # ---------------- LOGGING ---------------- #
 
 logging.basicConfig(
-    filename=f"{LOG_DIR}/etl.log",
-    level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s"
+    filename=f"{LOG_DIR}/etl.log",  # Archivo de log
+    level=logging.INFO,             # Nivel de detalle
+    format="%(asctime)s - %(levelname)s - %(message)s"  # Formato del log
 )
 
 
-# ---------------- DATABASE ---------------- #
+# ---------------- UTILIDADES ---------------- #
 
-engine = create_engine(DB_URL)
-
-def get_connection():
-    return engine.begin()
-
-
-# ---------------- CACHE ---------------- #
-
-CLIENT_CACHE = set()
-
-
-# ---------------- UTILIDADES TEXTO ---------------- #
-
-def remove_accents(text: str) -> str | None:
+def remove_accents(text):
+    # Elimina acentos y caracteres diacríticos
     if pd.isna(text):
         return None
     return ''.join(
@@ -62,35 +47,28 @@ def remove_accents(text: str) -> str | None:
         if unicodedata.category(c) != 'Mn'
     )
 
-def clean_text(text: str) -> str | None:
+def clean_text(text):
+    # Limpieza general: elimina acentos y espacios
     if pd.isna(text):
         return None
-    return remove_accents(text).strip()
+    text = remove_accents(text)
+    return text.strip()
 
-def normalize_name_case(name: str) -> str | None:
-    if pd.isna(name):
-        return None
-    cleaned = clean_text(name)
-    if not cleaned:
-        return cleaned
-    cleaned = re.sub(r"\s+", " ", cleaned)
-    return cleaned.title()
-
-
-# ---------------- VALIDACIONES ---------------- #
-
-def validate_email(email: str) -> bool:
+def validate_email(email):
+    # Valida formato básico de correo electrónico
     if not email:
         return False
     pattern = r"^[\w\.-]+@[\w\.-]+\.\w+$"
     return re.match(pattern, email) is not None
 
-def validate_phone(phone: str) -> bool:
+def validate_phone(phone):
+    # Valida que el teléfono tenga solo dígitos y mínimo 9 caracteres
     if not phone:
         return False
     return phone.isdigit() and len(phone) >= 9
 
-def validate_dni(dni: str) -> bool:
+def validate_dni(dni):
+    # Valida DNI español (8 números + letra correcta)
     if not dni:
         return False
     dni = dni.upper()
@@ -101,163 +79,140 @@ def validate_dni(dni: str) -> bool:
     letters = "TRWAGMYFPDXBNJZSQVHLCKE"
     return letters[int(number) % 23] == letter
 
-def validate_name_case(name: str) -> bool:
-    if not name:
-        return False
-    normalized = normalize_name_case(name)
-    return normalized is not None and name == normalized
-
-
-# ---------------- SEGURIDAD ---------------- #
-
-def hash_value(value: str) -> str:
+def hash_value(value):
+    # Genera hash SHA-256 con sal
     return hashlib.sha256((SALT + value).encode()).hexdigest()
 
-def mask_card(card: str) -> str:
-    card = re.sub(r"\D", "", card)
+def mask_card(card):
+    # Enmascara tarjeta mostrando solo los últimos 4 dígitos
+    card = re.sub(r"\D", "", card)  # Elimina caracteres no numéricos
     return "XXXX-XXXX-XXXX-" + card[-4:]
 
 
-# ---------------- FECHAS ---------------- #
+# ---------------- CARGA DE CSV ---------------- #
 
-def parse_expiration_date(value: str) -> str | None:
-    """
-    Convierte MM/YY o YYYY-MM a YYYY-MM-01
-    """
-    if not value:
-        return None
-    try:
-        if "/" in value:
-            return datetime.strptime(value, "%m/%y").strftime("%Y-%m-01")
-        return datetime.strptime(value, "%Y-%m").strftime("%Y-%m-01")
-    except ValueError:
-        return None
-
-
-# ---------------- CSV ---------------- #
-
-def load_csv(file_path: str) -> pd.DataFrame:
+def load_csv(file_path):
+    # Carga CSV con separador ; y todo como texto
     return pd.read_csv(
         file_path,
         sep=";",
         dtype=str,
         encoding="utf-8",
-        on_bad_lines="skip"
+        on_bad_lines="skip"  # Ignora líneas corruptas
     )
 
 
-# ---------------- CLIENTES ---------------- #
+# ---------------- ETL CLIENTES ---------------- #
 
-def cliente_exists(conn, cliente_id: str, nombre: str) -> bool:
-    query = text("""
-        SELECT 1
-        FROM clientes
-        WHERE id = :id AND nombre = :nombre
-        LIMIT 1
-    """)
-    result = conn.execute(query, {"id": cliente_id, "nombre": nombre})
-    return result.first() is not None
-
-
-def process_clientes(df: pd.DataFrame) -> pd.DataFrame:
-    rejected = []
+def process_clientes(df):
+    rejected = []  # Lista para almacenar filas rechazadas
 
     df = df.astype("string").apply(lambda col: col.map(clean_text))
-    df["correo"] = df["correo"].str.lower()
-    df["Nombre_OK"] = df["nombre"].apply(validate_name_case).map({True: "Y", False: "N"})
-    df["nombre"] = df["nombre"].apply(normalize_name_case)
 
+
+    df["correo"] = df["correo"].str.lower()  # Normaliza correos a minúsculas
+
+    # Validación de DNI
     df["DNI_OK"] = df["dni"].apply(validate_dni).map({True: "Y", False: "N"})
-    df["Telefono_OK"] = df["telefono"].apply(validate_phone).map({True: "Y", False: "N"})
-    df["Correo_OK"] = df["correo"].apply(validate_email).map({True: "Y", False: "N"})
+    df["DNI_KO"] = df["DNI_OK"].map({"Y": "N", "N": "Y"})
 
-    for _, row in df.iterrows():
+    # Validación de teléfono
+    df["Telefono_OK"] = df["telefono"].apply(validate_phone).map({True: "Y", False: "N"})
+    df["Telefono_KO"] = df["Telefono_OK"].map({"Y": "N", "N": "Y"})
+
+    # Validación de correo
+    df["Correo_OK"] = df["correo"].apply(validate_email).map({True: "Y", False: "N"})
+    df["Correo_KO"] = df["Correo_OK"].map({"Y": "N", "N": "Y"})
+
+    # Recolectar filas rechazadas por correo inválido
+    for idx, row in df.iterrows():
         if row["Correo_OK"] == "N":
             rejected.append(row)
 
+    # Filas válidas
     df_valid = df[df["Correo_OK"] == "Y"]
+
+    # Filas rechazadas
     df_rejected = pd.DataFrame(rejected)
 
+    # Guardar rechazados si existen
     if not df_rejected.empty:
         df_rejected.to_csv(f"{ERROR_DIR}/rows_rejected.csv", index=False)
 
-    # ---- FILTRADO POR CACHE + DB ---- #
-
-    filtered_rows = []
-
-    with get_connection() as conn:
-        for _, row in df_valid.iterrows():
-            key = (row["id"], row["nombre"])
-
-            if key in CLIENT_CACHE:
-                continue
-
-            if cliente_exists(conn, row["id"], row["nombre"]):
-                CLIENT_CACHE.add(key)
-                continue
-
-            CLIENT_CACHE.add(key)
-            filtered_rows.append(row)
-
-    return pd.DataFrame(filtered_rows)
+    return df_valid
 
 
-# ---------------- TARJETAS ---------------- #
+# ---------------- ETL TARJETAS ---------------- #
 
-def process_tarjetas(df: pd.DataFrame) -> pd.DataFrame:
+def process_tarjetas(df):
     df = df.astype("string").apply(lambda col: col.map(clean_text))
-    if "cod_cliente" in df.columns:
-        df["cod_cliente"] = df["cod_cliente"].str.upper()
 
+
+    # Enmascarado y hashing de tarjeta
     df["numero_tarjeta_masked"] = df["numero_tarjeta"].apply(mask_card)
     df["numero_tarjeta_hash"] = df["numero_tarjeta"].apply(hash_value)
 
-    df["fecha_expiracion"] = df["fecha_expiracion"].apply(parse_expiration_date)
-
+    # Eliminación de datos sensibles
     df.drop(columns=["numero_tarjeta", "cvv"], inplace=True)
 
     return df
 
 
-# ---------------- LOAD DB ---------------- #
+# ---------------- CARGA A BASE DE DATOS ---------------- #
 
-def load_to_db(df: pd.DataFrame, table_name: str) -> None:
-    logging.info(f"Cargando datos en {table_name}")
-    with get_connection() as conn:
+def load_to_db(df, table_name):
+    engine = create_engine(DB_URL)  # Crear engine de conexión
+
+    print(f"Cargando datos en la tabla {table_name}...")
+
+    # Inserción en la tabla correspondiente
+    with engine.begin() as conn:
         df.to_sql(table_name, conn, if_exists="append", index=False)
 
+        print(f"Carga en {table_name} completada.")
 
-# ---------------- PIPELINE ---------------- #
+
+# ---------------- PIPELINE PRINCIPAL ---------------- #
 
 def run_pipeline():
     logging.info("Inicio del pipeline ETL")
 
+    # Recorrer archivos del directorio de entrada
     for file in os.listdir(INPUT_DIR):
 
-        file_path = f"{INPUT_DIR}/{file}"
-
+        # Procesar clientes
         if re.match(r"Clientes-\d{4}-\d{2}-\d{2}\.csv", file):
             logging.info(f"Procesando {file}")
-            df = load_csv(file_path)
+            df = load_csv(f"{INPUT_DIR}/{file}")
             df_clean = process_clientes(df)
-            df_clean.to_csv(f"{OUTPUT_DIR}/{file}.cleaned.csv", index=False)
+            output_file = f"{OUTPUT_DIR}/{file.replace('.csv', '.cleaned.csv')}"
+            df_clean.to_csv(output_file, index=False)
             load_to_db(df_clean, "clientes")
 
+            print(f"Archivo {file} procesado y cargado a la base de datos.")
+
+        # Procesar tarjetas
         elif re.match(r"Tarjetas-\d{4}-\d{2}-\d{2}\.csv", file):
             logging.info(f"Procesando {file}")
-            df = load_csv(file_path)
+            df = load_csv(f"{INPUT_DIR}/{file}")
             df_clean = process_tarjetas(df)
-            df_clean.to_csv(f"{OUTPUT_DIR}/{file}.cleaned.csv", index=False)
+            output_file = f"{OUTPUT_DIR}/{file.replace('.csv', '.cleaned.csv')}"
+            df_clean.to_csv(output_file, index=False)
             load_to_db(df_clean, "tarjetas")
 
+            print(f"Archivo {file} procesado y cargado a la base de datos.")
+
+        # Ignorar otros archivos
         else:
             logging.warning(f"Fichero ignorado: {file}")
-
+            print(f"Fichero {file} ignorado.")
+        
     logging.info("Fin del pipeline ETL")
+    print("ETL pipeline se ha completado exitosamente.")
 
 
-# ---------------- MAIN ---------------- #
+# ---------------- EJECUCIÓN ---------------- #
 
 if __name__ == "__main__":
-    run_pipeline()
+    run_pipeline()  # Ejecuta el pipeline completo
     print("Pipeline ETL completado.")
