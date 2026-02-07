@@ -1,0 +1,7 @@
+ejecuta el comando 'crontab -e' y agrega el siguiente comando para habilitar la ejecucion automatica.
+
+IMPORTANTE: cambiar la ruta de los comandos a la ruta de donde esta tu proyecto
+
+# *(minuto) *(hora) *(dia) *(mes) *(dia de semana) (comando ejecutado)
+15 20 * * * cd /home/narf/Downloads/GRUPO-PLATANO-main && python3 run_pipeline.py
+
