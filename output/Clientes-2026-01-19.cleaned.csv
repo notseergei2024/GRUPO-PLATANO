@@ -1,51 +1,51 @@
-cod_cliente,nombre,apellido1,apellido2,correo,telefono,DNI_OK,DNI_KO,Telefono_OK,Telefono_KO,Correo_OK,Correo_KO,dni_hash
-C026,lvaro,Campos,Rojas,alvaro.campos@correo.es,612345026,N,Y,Y,N,Y,N,49124047a4d4cbc25fa715d9925c63ed27f4e185385538e0d8612873638aec14
-C027,Noelia,Vidal,Soto,noelia.vidal@correo.es,612345027,N,Y,Y,N,Y,N,50a9436a7257c64f5d23eb28ff8208223dfc5b432ea52311020b6dc356bb0f6c
-C028,scar,Mora,Arias,oscar.mora@correo.es,612345028,N,Y,Y,N,Y,N,3046eca85e4697aa7e314ae9f25adc543e4bcbf343c8827305172f9ed459a1bf
-C029,Eva,Dom nguez,Navas,eva.dominguez@correo.es,612345029,N,Y,Y,N,Y,N,e8ec2b569e6dce999480cf0c494ac7a5e0ca7e05f2760a9a718cc1b9babd89b1
-C030,Rub n,Cabrera,Salas,ruben.cabrera@correo.es,612345030,N,Y,Y,N,Y,N,e02f9d7fdc093952c18854b7a9e050e674fe8e1a8122986f914f1c11a088e075
-C031,Claudia,Ferrer,Lorenzo,claudia.ferrer@correo.es,612345031,Y,N,Y,N,Y,N,051c94e6fda474ead4b086c2789e05d95c383254f64f81b25608d41a12f4d33a
-C032,Mario,Redondo,Ben tez,mario.redondo@correo.es,612345032,N,Y,Y,N,Y,N,4924d729ae6e0100d4be870cdd1b948fad4ee3fc046e61b3e8326ee8df042e47
-C033,Alicia,Rold n,Moya,alicia.roldan@correo.es,612345033,N,Y,Y,N,Y,N,9612bf6fd819ff087e8b4b322e452ded8c6cda1ff5a1e1287b7306b0f74dae17
-C034,Samuel,Cano,Soler,samuel.cano@correo.es,612345034,N,Y,Y,N,Y,N,a4f074b35dad45d252140906b4ba82218dd2ae27f9e41daf16db75198f6f22ba
-C035,Andrea,Pascual,Esteban,andrea.pascual@correo.es,612345035,N,Y,Y,N,Y,N,eff9d5244bfa9158374de1a5a956a747bc85d64f193e3493eeb7b3e8d7f98cf4
-C036,V ctor,Aparicio,Montes,victor.aparicio@correo.es,612345036,N,Y,Y,N,Y,N,32355316406deeaf9ba2cbe3ce0b8ec43e2b15af282dd9c2ffcbe7c9d13ba495
-C037,Lorena,Santana,Corral,lorena.santana@correo.es,612345037,N,Y,Y,N,Y,N,5b8d2817e37090b03a382b7ae11f7b677cf25a6fb4291aa1ad6bb1cf531bb168
-C038,Guillermo,Lara,Rico,guillermo.lara@correo.es,612345038,N,Y,Y,N,Y,N,8609531517de0604cedba0899780925a1f041e973fabbd9088487d0c9eafed42
-C039,Cristina,Franco,Varela,cristina.franco@correo.es,612345039,N,Y,Y,N,Y,N,835a795076518038523bd8103b1438ac096dad45c8b7181cfb38857d749a7d15
-C040,Diego,Pacheco,S ez,diego.pacheco@correo.es,612345040,N,Y,Y,N,Y,N,fea540968ea26b7bff4f68b6e05d8d7cfab520c8c894fa5d4fab473110ac5048
-C041,M nica,Escobar,Bravo,monica.escobar@correo.es,612345041,N,Y,Y,N,Y,N,7df5a131836eaf1cba433781921b003cb53cf68993ba8fab252afb4ea1f3ad91
-C042,Jorge,Cuevas,Sierra,jorge.cuevas@correo.es,612345042,N,Y,Y,N,Y,N,bd878961a9982b367d1130fd02c5fcc973bf5b568cac80feb5c326396f0067b9
-C043,Nuria,Valero,Peinado,nuria.valero@correo.es,612345043,N,Y,Y,N,Y,N,1a5c1ab732de9379ee657a0806b675d90c0d6550806e2a12723fbad64caf1104
-C044,Adri n,Padilla,Tejada,adrian.padilla@correo.es,612345044,N,Y,Y,N,Y,N,86b1f656e1c2fd4cb83854997e6aec8803f969e5fcd2b3fd3cf8e57567572dea
-C045,Sara,Zamora,Lillo,sara.zamora@correo.es,612345045,N,Y,Y,N,Y,N,8dfaaa1e589b9966045e264aa5149b2a3320bfa7cb092ad4974ab150977e898b
-C046,H ctor,Coronado,Ib ez,hector.coronado@correo.es,612345046,N,Y,Y,N,Y,N,5d4006592adc79a5f8a2e840541421eca4e9efa2cf651169e0a127ec3c14beec
-C047,Paula,Ojeda,Carrasco,paula.ojeda@correo.es,612345047,N,Y,Y,N,Y,N,0af9aeb909e6788a13990d22ca2983c629afa8d8b1d7082e3d78edd0d9d6e4a7
-C048,Ignacio,Beltr n,Gallego,ignacio.beltran@correo.es,612345048,N,Y,Y,N,Y,N,19019ea1d7aa79df7fddd67f84f3ef101f82f228b14493700b32c2edac525bf9
-C049,Roc o,Quesada,Heredia,rocio.quesada@correo.es,612345049,N,Y,Y,N,Y,N,76035abcdc0886630a9107d641157fc95099df3024c87399fc0d078d652f4ab7
-C050,Marcos,Villalba,Ros,marcos.villalba@correo.es,612345050,N,Y,Y,N,Y,N,c7b5477cb97f2444ef31f86b0e1f27c1f2a9c62914ee8505460451c557135e9f
-C051,Isabel,Mill n,Toledo,isabel.millan@correo.es,612345051,Y,N,Y,N,Y,N,c17a81c511e81061b64396e725a04585ec3e2ec8195a74eaf2b771a3d364393b
-C052,Andr s,Aranda,Plaza,andres.aranda@correo.es,612345052,N,Y,Y,N,Y,N,400e17c2f42237e0153346e936d66aa2b7de702941ca04da379b85c538fffc1e
-C053,Julia,Benito,Falc n,julia.benito@correo.es,612345053,N,Y,Y,N,Y,N,e9749a2c066eea357915f0d83e7be17a8645ede7cef9f77f4e4451379548c6cb
-C054,Tom s,Lafuente,Bl zquez,tomas.lafuente@correo.es,612345054,N,Y,Y,N,Y,N,8e6d2ac55079b21a5e1f63085cbc7f7bfa4ea448560d6a3fae6fe5bcb651de67
-C055,Ver nica,Saura,Crespo,veronica.saura@correo.es,612345055,N,Y,Y,N,Y,N,bf513c7f67a3f0d59ef534de6dbaedf229310f42adee7088b782eac84a45b867
-C056,Borja,Moreno,Escudero,borja.moreno@correo.es,612345056,N,Y,Y,N,Y,N,a71b67280252555063f3dd11d6207bb13ae904704db41126a1343cbaf95d89e0
-C057,In s,Gallardo,Rivas,ines.gallardo@correo.es,612345057,N,Y,Y,N,Y,N,a07d0ec67600837bfd0fb59934ede6eb06a077453c6e51d4ace34bd93f69c3b3
-C058,Rodrigo,Sim n,Barrio,rodrigo.simon@correo.es,612345058,Y,N,Y,N,Y,N,41c264c529a12964cabaf34586bed306a7cdd08e97a8f1cea86568053e5dc53e
-C059,Teresa,Alonso,Requena,teresa.alonso@correo.es,612345059,N,Y,Y,N,Y,N,6a1145e5faeddc074d1b2220ced5e1c825f09de4675a0a35aaa7c9f9440b943c
-C060,ngel,Nieto,Sancho,angel.nieto@correo.es,612345060,N,Y,Y,N,Y,N,81c88345f1774dee62f32f2f1c0bf18271a15d8de07298c58f31c0f989e653ea
-C061,Celia,Berm dez,Vicente,celia.bermudez@correo.es,612345061,N,Y,Y,N,Y,N,638d325a03f7b943b82c2b83f4f2564f817b79df058ccd4987633fabbaf2b664
-C062,Emilio,Segura,Casado,emilio.segura@correo.es,612345062,N,Y,Y,N,Y,N,e7b6a6d6754463ac3699947a4e9b1a6d3541d47775c74af086f50435d731403f
-C063,Raquel,Prats,Batlle,raquel.prats@correo.es,612345063,N,Y,Y,N,Y,N,1a7a1569d5036c0f99ffc196189199984a0c3f8a500e9d577a55d5566f9bdc9c
-C064,Federico,Maldonado,Rom n,federico.maldonado@correo.es,612345064,N,Y,Y,N,Y,N,b3c776391a3ecc1ee0cc85f8263d6131ba01577f3cd20e4935f8cb785ef9e110
-C065,Olga,Ballesteros,Garrido,olga.ballesteros@correo.es,612345065,N,Y,Y,N,Y,N,022f0bb35c0cbca8b155d7c3f1c25901db1eb86b172afc098e6dc0165c2b73b4
-C066,Lucas,T llez,Montero,lucas.tellez@correo.es,612345066,N,Y,Y,N,Y,N,6b491dda719a2f51df6ae726c9aefc0fb50ef564ad4f3cc82ca7b27622f4a7a7
-C067,Ainhoa,Sol s,Cuenca,ainhoa.solis@correo.es,612345067,N,Y,Y,N,Y,N,32e1c6cd11cd85e11c61770797db310340f9c1e707275d0b6b905b73f1ea92d0
-C068,Bruno,Hidalgo,Vico,bruno.hidalgo@correo.es,612345068,N,Y,Y,N,Y,N,500e26eac8b43bdcaae9513f84b3a65693a434c8a75f03a26a4e7f949daea892
-C069,Esther,Parra,Manzano,esther.parra@correo.es,612345069,N,Y,Y,N,Y,N,65f5d046c87deb6257a8990a6f57ed56672f3a0f77ff4eb645ad7757e361e9b8
-C070,Fabi n,Rojo,L zaro,fabian.rojo@correo.es,612345070,N,Y,Y,N,Y,N,17c31e06d7dfb0db1b2f7b0e4caaa9dbdc56de9b72923070afd3b47fcb9416d6
-C071,Lidia,Ramos,Cobos,lidia.ramos@correo.es,612345071,N,Y,Y,N,Y,N,d4a2a691d36f5a02a3dfe2ddc33cbdc8760f1db6485c2c152729b0e297ed38d4
-C072,Mateo,Del R o,Santisteban,mateo.delrio@correo.es,612345072,N,Y,Y,N,Y,N,c5e4ba8e40f281d59294e7196f14a3ab67ac8ff66c03c9fbcfa60c401f9e948e
-C073,Yolanda,Acedo,Barrios,yolanda.acedo@correo.es,612345073,N,Y,Y,N,Y,N,5fd69925c9420a9a54e111d32943a2d61a82f911de30426ce6aeb08af54b8192
-C074,Julio,Pe alver,Sampedro,julio.penalver@correo.es,612345074,N,Y,Y,N,Y,N,f3f41d608bc063e03ddc4f98dc66638f933ad0df0484da4c515ee4e2d7527613
-C075,B rbara,Urbano,M rquez,barbara.urbano@correo.es,612345075,N,Y,Y,N,Y,N,0de8be182cbee8afbc33063bd7d28c6e62fc10781f695286e881af8a190aa167
+cod_cliente,nombre,apellido1,apellido2,dni,correo,telefono
+C026,lvaro,Campos,Rojas,49124047a4d4cbc25fa715d9925c63ed27f4e185385538e0d8612873638aec14,alvaro.campos@correo.es,612345026
+C027,Noelia,Vidal,Soto,50a9436a7257c64f5d23eb28ff8208223dfc5b432ea52311020b6dc356bb0f6c,noelia.vidal@correo.es,612345027
+C028,scar,Mora,Arias,3046eca85e4697aa7e314ae9f25adc543e4bcbf343c8827305172f9ed459a1bf,oscar.mora@correo.es,612345028
+C029,Eva,Dom nguez,Navas,e8ec2b569e6dce999480cf0c494ac7a5e0ca7e05f2760a9a718cc1b9babd89b1,eva.dominguez@correo.es,612345029
+C030,Rub n,Cabrera,Salas,e02f9d7fdc093952c18854b7a9e050e674fe8e1a8122986f914f1c11a088e075,ruben.cabrera@correo.es,612345030
+C031,Claudia,Ferrer,Lorenzo,051c94e6fda474ead4b086c2789e05d95c383254f64f81b25608d41a12f4d33a,claudia.ferrer@correo.es,612345031
+C032,Mario,Redondo,Ben tez,4924d729ae6e0100d4be870cdd1b948fad4ee3fc046e61b3e8326ee8df042e47,mario.redondo@correo.es,612345032
+C033,Alicia,Rold n,Moya,9612bf6fd819ff087e8b4b322e452ded8c6cda1ff5a1e1287b7306b0f74dae17,alicia.roldan@correo.es,612345033
+C034,Samuel,Cano,Soler,a4f074b35dad45d252140906b4ba82218dd2ae27f9e41daf16db75198f6f22ba,samuel.cano@correo.es,612345034
+C035,Andrea,Pascual,Esteban,eff9d5244bfa9158374de1a5a956a747bc85d64f193e3493eeb7b3e8d7f98cf4,andrea.pascual@correo.es,612345035
+C036,V ctor,Aparicio,Montes,32355316406deeaf9ba2cbe3ce0b8ec43e2b15af282dd9c2ffcbe7c9d13ba495,victor.aparicio@correo.es,612345036
+C037,Lorena,Santana,Corral,5b8d2817e37090b03a382b7ae11f7b677cf25a6fb4291aa1ad6bb1cf531bb168,lorena.santana@correo.es,612345037
+C038,Guillermo,Lara,Rico,8609531517de0604cedba0899780925a1f041e973fabbd9088487d0c9eafed42,guillermo.lara@correo.es,612345038
+C039,Cristina,Franco,Varela,835a795076518038523bd8103b1438ac096dad45c8b7181cfb38857d749a7d15,cristina.franco@correo.es,612345039
+C040,Diego,Pacheco,S ez,fea540968ea26b7bff4f68b6e05d8d7cfab520c8c894fa5d4fab473110ac5048,diego.pacheco@correo.es,612345040
+C041,M nica,Escobar,Bravo,7df5a131836eaf1cba433781921b003cb53cf68993ba8fab252afb4ea1f3ad91,monica.escobar@correo.es,612345041
+C042,Jorge,Cuevas,Sierra,bd878961a9982b367d1130fd02c5fcc973bf5b568cac80feb5c326396f0067b9,jorge.cuevas@correo.es,612345042
+C043,Nuria,Valero,Peinado,1a5c1ab732de9379ee657a0806b675d90c0d6550806e2a12723fbad64caf1104,nuria.valero@correo.es,612345043
+C044,Adri n,Padilla,Tejada,86b1f656e1c2fd4cb83854997e6aec8803f969e5fcd2b3fd3cf8e57567572dea,adrian.padilla@correo.es,612345044
+C045,Sara,Zamora,Lillo,8dfaaa1e589b9966045e264aa5149b2a3320bfa7cb092ad4974ab150977e898b,sara.zamora@correo.es,612345045
+C046,H ctor,Coronado,Ib ez,5d4006592adc79a5f8a2e840541421eca4e9efa2cf651169e0a127ec3c14beec,hector.coronado@correo.es,612345046
+C047,Paula,Ojeda,Carrasco,0af9aeb909e6788a13990d22ca2983c629afa8d8b1d7082e3d78edd0d9d6e4a7,paula.ojeda@correo.es,612345047
+C048,Ignacio,Beltr n,Gallego,19019ea1d7aa79df7fddd67f84f3ef101f82f228b14493700b32c2edac525bf9,ignacio.beltran@correo.es,612345048
+C049,Roc o,Quesada,Heredia,76035abcdc0886630a9107d641157fc95099df3024c87399fc0d078d652f4ab7,rocio.quesada@correo.es,612345049
+C050,Marcos,Villalba,Ros,c7b5477cb97f2444ef31f86b0e1f27c1f2a9c62914ee8505460451c557135e9f,marcos.villalba@correo.es,612345050
+C051,Isabel,Mill n,Toledo,c17a81c511e81061b64396e725a04585ec3e2ec8195a74eaf2b771a3d364393b,isabel.millan@correo.es,612345051
+C052,Andr s,Aranda,Plaza,400e17c2f42237e0153346e936d66aa2b7de702941ca04da379b85c538fffc1e,andres.aranda@correo.es,612345052
+C053,Julia,Benito,Falc n,e9749a2c066eea357915f0d83e7be17a8645ede7cef9f77f4e4451379548c6cb,julia.benito@correo.es,612345053
+C054,Tom s,Lafuente,Bl zquez,8e6d2ac55079b21a5e1f63085cbc7f7bfa4ea448560d6a3fae6fe5bcb651de67,tomas.lafuente@correo.es,612345054
+C055,Ver nica,Saura,Crespo,bf513c7f67a3f0d59ef534de6dbaedf229310f42adee7088b782eac84a45b867,veronica.saura@correo.es,612345055
+C056,Borja,Moreno,Escudero,a71b67280252555063f3dd11d6207bb13ae904704db41126a1343cbaf95d89e0,borja.moreno@correo.es,612345056
+C057,In s,Gallardo,Rivas,a07d0ec67600837bfd0fb59934ede6eb06a077453c6e51d4ace34bd93f69c3b3,ines.gallardo@correo.es,612345057
+C058,Rodrigo,Sim n,Barrio,41c264c529a12964cabaf34586bed306a7cdd08e97a8f1cea86568053e5dc53e,rodrigo.simon@correo.es,612345058
+C059,Teresa,Alonso,Requena,6a1145e5faeddc074d1b2220ced5e1c825f09de4675a0a35aaa7c9f9440b943c,teresa.alonso@correo.es,612345059
+C060,ngel,Nieto,Sancho,81c88345f1774dee62f32f2f1c0bf18271a15d8de07298c58f31c0f989e653ea,angel.nieto@correo.es,612345060
+C061,Celia,Berm dez,Vicente,638d325a03f7b943b82c2b83f4f2564f817b79df058ccd4987633fabbaf2b664,celia.bermudez@correo.es,612345061
+C062,Emilio,Segura,Casado,e7b6a6d6754463ac3699947a4e9b1a6d3541d47775c74af086f50435d731403f,emilio.segura@correo.es,612345062
+C063,Raquel,Prats,Batlle,1a7a1569d5036c0f99ffc196189199984a0c3f8a500e9d577a55d5566f9bdc9c,raquel.prats@correo.es,612345063
+C064,Federico,Maldonado,Rom n,b3c776391a3ecc1ee0cc85f8263d6131ba01577f3cd20e4935f8cb785ef9e110,federico.maldonado@correo.es,612345064
+C065,Olga,Ballesteros,Garrido,022f0bb35c0cbca8b155d7c3f1c25901db1eb86b172afc098e6dc0165c2b73b4,olga.ballesteros@correo.es,612345065
+C066,Lucas,T llez,Montero,6b491dda719a2f51df6ae726c9aefc0fb50ef564ad4f3cc82ca7b27622f4a7a7,lucas.tellez@correo.es,612345066
+C067,Ainhoa,Sol s,Cuenca,32e1c6cd11cd85e11c61770797db310340f9c1e707275d0b6b905b73f1ea92d0,ainhoa.solis@correo.es,612345067
+C068,Bruno,Hidalgo,Vico,500e26eac8b43bdcaae9513f84b3a65693a434c8a75f03a26a4e7f949daea892,bruno.hidalgo@correo.es,612345068
+C069,Esther,Parra,Manzano,65f5d046c87deb6257a8990a6f57ed56672f3a0f77ff4eb645ad7757e361e9b8,esther.parra@correo.es,612345069
+C070,Fabi n,Rojo,L zaro,17c31e06d7dfb0db1b2f7b0e4caaa9dbdc56de9b72923070afd3b47fcb9416d6,fabian.rojo@correo.es,612345070
+C071,Lidia,Ramos,Cobos,d4a2a691d36f5a02a3dfe2ddc33cbdc8760f1db6485c2c152729b0e297ed38d4,lidia.ramos@correo.es,612345071
+C072,Mateo,Del R o,Santisteban,c5e4ba8e40f281d59294e7196f14a3ab67ac8ff66c03c9fbcfa60c401f9e948e,mateo.delrio@correo.es,612345072
+C073,Yolanda,Acedo,Barrios,5fd69925c9420a9a54e111d32943a2d61a82f911de30426ce6aeb08af54b8192,yolanda.acedo@correo.es,612345073
+C074,Julio,Pe alver,Sampedro,f3f41d608bc063e03ddc4f98dc66638f933ad0df0484da4c515ee4e2d7527613,julio.penalver@correo.es,612345074
+C075,B rbara,Urbano,M rquez,0de8be182cbee8afbc33063bd7d28c6e62fc10781f695286e881af8a190aa167,barbara.urbano@correo.es,612345075
