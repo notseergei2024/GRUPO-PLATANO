@@ -1,0 +1,20 @@
+2026-01-25 23:08:15,133 - INFO -  INICIO PIPELINE ETL
+2026-01-25 23:08:15,134 - INFO - Rutas: input=C:\Users\storm\PycharmProjects\GRUPO-PLATANO\input output=C:\Users\storm\PycharmProjects\GRUPO-PLATANO\output errors=C:\Users\storm\PycharmProjects\GRUPO-PLATANO\errors
+2026-01-25 23:08:15,134 - INFO - Patrones: ^Clientes-\d{4}-\d{2}-\d{2}\.csv$ | ^Tarjetas-\d{4}-\d{2}-\d{2}\.csv$
+2026-01-25 23:08:15,134 - INFO -  Archivos encontrados en 'input': 2
+2026-01-25 23:08:15,134 - INFO -    - Clientes-2026-01-19.csv
+2026-01-25 23:08:15,134 - INFO -    - Tarjetas-2026-01-19.csv
+2026-01-25 23:08:15,134 - INFO -  Clientes válidos por patrón: 1 -> ['Clientes-2026-01-19.csv']
+2026-01-25 23:08:15,136 - INFO -  Tarjetas válidos por patrón: 1 -> ['Tarjetas-2026-01-19.csv']
+2026-01-25 23:08:15,168 - INFO -  Probando conexión a MySQL...
+2026-01-25 23:08:15,293 - INFO -  Conexión a MySQL OK (SELECT 1)
+2026-01-25 23:08:15,311 - INFO -  Clientes existentes en BD: 50
+2026-01-25 23:08:15,311 - INFO - 
+ Procesando CLIENTES: Clientes-2026-01-19.csv
+2026-01-25 23:08:15,311 - INFO -  Leyendo CSV: input\Clientes-2026-01-19.csv
+2026-01-25 23:08:15,313 - INFO -  CSV cargado (utf-8) filas=50 columnas=7
+2026-01-25 23:08:15,313 - INFO -    Columnas: ['cod_cliente', 'nombre', 'apellido1', 'apellido2', 'dni', 'correo', 'telefono']
+2026-01-25 23:08:15,313 - INFO - ETL Clientes: limpieza general (strip + quitar acentos)...
+2026-01-25 23:08:15,317 - INFO -  Validaciones: DNI / Teléfono / Correo...
+2026-01-25 23:08:15,320 - INFO -  Clientes: válidas=50 | rechazadas=0
+2026-01-25 23:08:15,324 - INFO -  Output clientes guardado: output\Clientes-2026-01-19.cleaned.csv | filas=50
