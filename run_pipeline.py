@@ -92,6 +92,11 @@ def normalize_phone(phone):
     digits = re.sub(r"\D", "", str(phone))
     return digits if digits else None
 
+def normalize_cod(value):
+    if not value:
+        return None
+    return str(value).strip().upper()
+
 
 # ---------------- VALIDATORS ---------------- #
 
@@ -208,7 +213,14 @@ def require_columns(df: pd.DataFrame, required: list[str], source_file: str) -> 
 
 # ---------------- ETL CLIENTES ---------------- #
 
-def process_clientes(df: pd.DataFrame, source_file: str):
+def process_clientes(
+    df: pd.DataFrame,
+    source_file: str,
+    existing_codes: set[str],
+    existing_dni_hashes: set[str],
+    seen_codes: set[str],
+    seen_dnis: set[str],
+):
     logi("ETL Clientes: limpieza general (strip + quitar acentos)...")
 
     df = normalize_columns(df)
@@ -223,6 +235,7 @@ def process_clientes(df: pd.DataFrame, source_file: str):
 
     # Normalizaciones específicas
     df["correo"] = df["correo"].str.lower()
+    df["cod_cliente"] = df["cod_cliente"].apply(normalize_cod)
     df["dni"] = df["dni"].apply(normalize_dni)
     df["telefono"] = df["telefono"].apply(normalize_phone)
 
@@ -240,6 +253,26 @@ def process_clientes(df: pd.DataFrame, source_file: str):
     # ✅ No rechazamos por correo: insertamos TODOS para no romper FK
     df_rejected = df[df["Correo_OK"] == "N"].copy()
     df_valid = df.copy()
+
+    # Filtrado duplicados: en este lote y en BD (por cod_cliente o dni)
+    filtered_rows = []
+    for _, row in df_valid.iterrows():
+        cod_cliente = row.get("cod_cliente")
+        dni = row.get("dni")
+        dni_hash = hash_value(dni)
+
+        if cod_cliente in seen_codes or dni in seen_dnis:
+            continue
+        if cod_cliente in existing_codes or dni_hash in existing_dni_hashes:
+            seen_codes.add(cod_cliente)
+            seen_dnis.add(dni)
+            continue
+
+        seen_codes.add(cod_cliente)
+        seen_dnis.add(dni)
+        filtered_rows.append(row)
+
+    df_valid = pd.DataFrame(filtered_rows)
 
     # ✅ Hash dentro de la MISMA columna 'dni'
     df_valid["dni"] = df_valid["dni"].apply(hash_value)
@@ -263,7 +296,15 @@ def process_clientes(df: pd.DataFrame, source_file: str):
 
 # ---------------- ETL TARJETAS ---------------- #
 
-def process_tarjetas(df: pd.DataFrame, source_file: str, valid_clientes: set[str]):
+def process_tarjetas(
+    df: pd.DataFrame,
+    source_file: str,
+    valid_clientes: set[str],
+    existing_card_codes: set[str],
+    existing_card_hashes: set[str],
+    seen_card_codes: set[str],
+    seen_card_hashes: set[str],
+):
 
     logi("ETL Tarjetas: limpieza general (strip + quitar acentos)...")
 
@@ -280,7 +321,7 @@ def process_tarjetas(df: pd.DataFrame, source_file: str, valid_clientes: set[str
     print("DEBUG ejemplo cvv (primeras 3):", df["cvv"].head(3).tolist() if "cvv" in df.columns else "NO EXISTE")
 
     # ✅ Normaliza cod_cliente para comparar bien
-    df["cod_cliente"] = df["cod_cliente"].astype("string").map(clean_text)
+    df["cod_cliente"] = df["cod_cliente"].astype("string").map(clean_text).str.upper()
 
     # ✅ Filtrado FK: solo tarjetas cuyo cod_cliente exista en clientes
     mask_ok = df["cod_cliente"].isin(valid_clientes)
@@ -295,9 +336,27 @@ def process_tarjetas(df: pd.DataFrame, source_file: str, valid_clientes: set[str
         df_rejected.to_csv(rej_path, index=False)
         logw(f"Rechazados guardados en: {rej_path}")
 
-    # ✅ Hash dentro de las MISMAS columnas (sin añadir columnas)
+    # Hash para comparar duplicados y para BD
     df_valid["numero_tarjeta"] = df_valid["numero_tarjeta"].apply(hash_value)
     df_valid["cvv"] = df_valid["cvv"].apply(hash_value)
+
+    filtered_rows = []
+    for _, row in df_valid.iterrows():
+        cod_cliente = row.get("cod_cliente")
+        numero_hash = row.get("numero_tarjeta")
+
+        if cod_cliente in seen_card_codes or numero_hash in seen_card_hashes:
+            continue
+        if cod_cliente in existing_card_codes or numero_hash in existing_card_hashes:
+            seen_card_codes.add(cod_cliente)
+            seen_card_hashes.add(numero_hash)
+            continue
+
+        seen_card_codes.add(cod_cliente)
+        seen_card_hashes.add(numero_hash)
+        filtered_rows.append(row)
+
+    df_valid = pd.DataFrame(filtered_rows)
 
     # DataFrame EXACTO para BD (solo columnas reales)
     tarjetas_cols_db = ["cod_cliente", "numero_tarjeta", "fecha_exp", "cvv"]
@@ -332,6 +391,39 @@ def fetch_existing_client_codes(engine, db_ok: bool) -> set[str]:
         return {str(r[0]).strip() for r in rows if r[0] is not None}
     except Exception as e:
         logw(f"No se pudieron leer cod_cliente existentes de clientes: {e}")
+        return set()
+
+def fetch_existing_client_dnis(engine, db_ok: bool) -> set[str]:
+    if not db_ok or engine is None:
+        return set()
+    try:
+        with engine.connect() as conn:
+            rows = conn.execute(text("SELECT dni FROM clientes")).fetchall()
+        return {str(r[0]).strip() for r in rows if r[0] is not None}
+    except Exception as e:
+        logw(f"No se pudieron leer DNI existentes de clientes: {e}")
+        return set()
+
+def fetch_existing_card_hashes(engine, db_ok: bool) -> set[str]:
+    if not db_ok or engine is None:
+        return set()
+    try:
+        with engine.connect() as conn:
+            rows = conn.execute(text("SELECT numero_tarjeta FROM tarjetas")).fetchall()
+        return {str(r[0]).strip() for r in rows if r[0] is not None}
+    except Exception as e:
+        logw(f"No se pudieron leer tarjetas existentes: {e}")
+        return set()
+
+def fetch_existing_card_codes(engine, db_ok: bool) -> set[str]:
+    if not db_ok or engine is None:
+        return set()
+    try:
+        with engine.connect() as conn:
+            rows = conn.execute(text("SELECT cod_cliente FROM tarjetas")).fetchall()
+        return {str(r[0]).strip() for r in rows if r[0] is not None}
+    except Exception as e:
+        logw(f"No se pudieron leer cod_cliente existentes de tarjetas: {e}")
         return set()
 
 
@@ -395,7 +487,15 @@ def run_pipeline():
     engine = create_engine(DB_URL) if ENABLE_DB else None
     db_ok = test_db_connection(engine) if engine else False
     valid_clientes = fetch_existing_client_codes(engine, db_ok)
+    existing_dni_hashes = fetch_existing_client_dnis(engine, db_ok)
+    existing_card_hashes = fetch_existing_card_hashes(engine, db_ok)
+    existing_card_codes = fetch_existing_card_codes(engine, db_ok)
     logi(f" Clientes existentes en BD: {len(valid_clientes)}")
+
+    seen_client_codes: set[str] = set()
+    seen_client_dnis: set[str] = set()
+    seen_card_codes: set[str] = set()
+    seen_card_hashes: set[str] = set()
 
     # --- CLIENTES ---
     for file in clientes_files:
@@ -407,7 +507,14 @@ def run_pipeline():
             loge(f"Saltando {file} (no se pudo leer)")
             continue
 
-        df_clean, df_rej = process_clientes(df, file)
+        df_clean, df_rej = process_clientes(
+            df,
+            file,
+            valid_clientes,
+            existing_dni_hashes,
+            seen_client_codes,
+            seen_client_dnis,
+        )
         if df_clean is None:
             loge(f"Saltando {file} (fallo columnas requeridas)")
             continue
@@ -423,6 +530,9 @@ def run_pipeline():
         if ok_insert:
             valid_clientes.update(
                 df_clean["cod_cliente"].dropna().astype(str).map(str.strip).tolist()
+            )
+            existing_dni_hashes.update(
+                df_clean["dni"].dropna().astype(str).map(str.strip).tolist()
             )
         else:
             logw("No se actualiza valid_clientes porque el insert de CLIENTES falló.")
@@ -441,7 +551,15 @@ def run_pipeline():
             loge(f"Saltando {file} (no se pudo leer)")
             continue
 
-        df_clean = process_tarjetas(df, file, valid_clientes)
+        df_clean = process_tarjetas(
+            df,
+            file,
+            valid_clientes,
+            existing_card_codes,
+            existing_card_hashes,
+            seen_card_codes,
+            seen_card_hashes,
+        )
         if df_clean is None:
             loge(f"Saltando {file} (fallo columnas requeridas)")
             continue
