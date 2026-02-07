@@ -537,7 +537,7 @@ def run_pipeline():
         else:
             logw("No se actualiza valid_clientes porque el insert de CLIENTES falló.")
 
-    # ✅ Refrescamos desde BD para garantizar FK
+    # Refrescamos desde BD para garantizar FK
     valid_clientes = fetch_existing_client_codes(engine, db_ok)
     logi(f" Clientes existentes en BD (refresco): {len(valid_clientes)}")
 
