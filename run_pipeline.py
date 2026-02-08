@@ -250,7 +250,7 @@ def process_clientes(
     df["Correo_KO"] = df["Correo_OK"].map({"Y": "N", "N": "Y"})
 
     # Rechazados mínimos: correo inválido
-    # ✅ No rechazamos por correo: insertamos TODOS para no romper FK
+    #  No rechazamos por correo: insertamos TODOS para no romper FK
     df_rejected = df[df["Correo_OK"] == "N"].copy()
     df_valid = df.copy()
 
@@ -274,7 +274,7 @@ def process_clientes(
 
     df_valid = pd.DataFrame(filtered_rows)
 
-    # ✅ Hash dentro de la MISMA columna 'dni'
+    # Hash dentro de la MISMA columna 'dni'
     df_valid["dni"] = df_valid["dni"].apply(hash_value)
 
     logi(f" Clientes: válidas={len(df_valid)} | rechazadas={len(df_rejected)}")
@@ -285,7 +285,7 @@ def process_clientes(
         df_rejected.to_csv(rej_path, index=False)
         logw(f"Rechazados guardados en: {rej_path}")
 
-    # ✅ DataFrame EXACTO para BD (solo columnas reales)
+    # DataFrame EXACTO para BD (solo columnas reales)
     clientes_cols_db = ["cod_cliente", "nombre", "apellido1", "apellido2", "dni", "correo", "telefono"]
     df_db = df_valid[clientes_cols_db].copy()
 
@@ -320,10 +320,10 @@ def process_tarjetas(
           df["numero_tarjeta"].head(3).tolist() if "numero_tarjeta" in df.columns else "NO EXISTE")
     print("DEBUG ejemplo cvv (primeras 3):", df["cvv"].head(3).tolist() if "cvv" in df.columns else "NO EXISTE")
 
-    # ✅ Normaliza cod_cliente para comparar bien
+    # Normaliza cod_cliente para comparar bien
     df["cod_cliente"] = df["cod_cliente"].astype("string").map(clean_text).str.upper()
 
-    # ✅ Filtrado FK: solo tarjetas cuyo cod_cliente exista en clientes
+    # Filtrado FK: solo tarjetas cuyo cod_cliente exista en clientes
     mask_ok = df["cod_cliente"].isin(valid_clientes)
     df_rejected = df[~mask_ok].copy()
     df_valid = df[mask_ok].copy()
@@ -526,7 +526,7 @@ def run_pipeline():
 
         ok_insert = load_to_db(df_clean, "clientes", db_ok, engine)
 
-        # ✅ Solo añadimos al set si REALMENTE se insertó en BD
+        # Solo añadimos al set si REALMENTE se insertó en BD
         if ok_insert:
             valid_clientes.update(
                 df_clean["cod_cliente"].dropna().astype(str).map(str.strip).tolist()
@@ -575,8 +575,3 @@ def run_pipeline():
     logi(f"   - Log file: {os.path.abspath(os.path.join(LOG_DIR, f'etl_{RUN_ID}.log'))}")
     logi(" FIN PIPELINE ETL")
 
-
-# ---------------- MAIN ---------------- #
-
-if __name__ == "__main__":
-    run_pipeline()
